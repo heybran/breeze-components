@@ -1,0 +1,51 @@
+:host {
+  --step-size: 100px;
+  --indicator-size: 25px;
+  --indicator-background-color: orange;
+  --indicator-text-color: #fff;
+}
+
+[part=image-wrapper] {
+  position: relative;
+  display: inline-block;
+}
+
+::slotted([slot="image"]) {
+  width: var(--step-size);
+  height: var(--step-size);
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+[part=indicator] {
+  position: absolute;
+  width: var(--indicator-size);
+  height: var(--indicator-size);
+  border-radius: 50%;
+  background-color: var(--indicator-background-color);
+  color: var(--indicator-text-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0.2em;
+  left: calc(var(--step-size) / 2 - var(--triangle-length) - var(--indicator-size) / 2);
+  top: calc(var(--step-size) / 2 - var(--triangle-length) - var(--indicator-size) / 2);
+}
+
+:host([indicator-placement="north-east"]) [part=indicator] {
+  left: auto;
+  right: calc(var(--step-size) / 2 - var(--triangle-length) - var(--indicator-size) / 2);
+}
+
+:host([indicator-placement="south-east"]) [part=indicator] {
+  left: auto;
+  right: calc(var(--step-size) / 2 - var(--triangle-length) - var(--indicator-size) / 2);
+  top: auto;
+  bottom: calc(var(--step-size) / 2 - var(--triangle-length) - var(--indicator-size) / 2);
+}
+
+:host([indicator-placement="south-west"]) [part=indicator] {
+  top: auto;
+  bottom: calc(var(--step-size) / 2 - var(--triangle-length) - var(--indicator-size) / 2);
+}

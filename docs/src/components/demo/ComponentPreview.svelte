@@ -24,6 +24,7 @@
       'divider',
       'qr-code',
       'email-field',
+      'step',
     ];
 
     if (import.meta.env.MODE === 'development') {

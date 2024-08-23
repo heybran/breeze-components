@@ -32,6 +32,7 @@
       'side-nav-item',
       'side-nav',
       "space",
+      'step',
       'badge',
       'visually-hidden',
       'popover',
