@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
+import babel from "@rollup/plugin-babel";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,6 +17,12 @@ const getComponentName = (filePath) => {
 const componentsNames = fs.readdirSync(componentsDir);
 
 export default defineConfig({
+  server: {
+    fs: {
+      // Allow serving files outside of the root.
+      allow: [".."],
+    },
+  },
   build: {
     outDir: "dist",
     emptyOutDir: true,
@@ -40,5 +47,19 @@ export default defineConfig({
       plugins: [],
     },
   },
-  plugins: [],
+  plugins: [
+    babel({
+      babelrc: false,
+      configFile: "./.babelrc",
+      extensions: [".js"],
+      exclude: "node_modules/**",
+      babelHelpers: "bundled",
+    }),
+  ],
+  resolve: {
+    alias: {
+      // Optional: If you want to use aliases for better imports.
+      "@components": path.resolve(__dirname, "src/components"),
+    },
+  },
 });
