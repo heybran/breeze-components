@@ -32,6 +32,7 @@
       'side-nav-item',
       'side-nav',
       "space",
+      'step',
       'badge',
       'visually-hidden',
       'popover',
@@ -39,15 +40,9 @@
       'qr-code',
     ];
 
-    if (import.meta.env.MODE === 'development') {
-      components.forEach(name => {
-        import(`../../../src/components/${name}/${name}.js`);
-      })
-    } else if (import.meta.env.MODE === 'production') {
-      components.forEach(name => {
-        import(`../../../dist/${name}/index.js`);
-      })
-    }
+    components.forEach(name => {
+      import(`../../../dist/${name}/index.js`);
+    });
   }
 
   onMount(() => {

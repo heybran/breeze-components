@@ -24,17 +24,12 @@
       'divider',
       'qr-code',
       'email-field',
+      'step',
     ];
 
-    if (import.meta.env.MODE === 'development') {
-      components.forEach(name => {
-        import(`../../../../src/components/${name}/${name}.js`);
-      })
-    } else if (import.meta.env.MODE === 'production') {
-      components.forEach(name => {
-        import(`../../../../dist/components/${name}/${name}.js`);
-      })
-    }
+    components.forEach(name => {
+      import(`../../../../dist/${name}/index.js`);
+    });
   }
 
   export let component;

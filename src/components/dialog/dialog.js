@@ -5,106 +5,79 @@ import BaseElement from "../../shared/base-element.js";
 import "../button/button.js";
 import "../icon/icon.js";
 import "../tooltip/tooltip.js";
+import "../visually-hidden/visually-hidden.js";
+import { define, property } from "../../util/decorators.js";
 
+const tagName = "cc-dialog";
+
+@define(tagName)
 export default class CucumberDialog extends BaseElement {
-  /** @type {string} */
-  static __localName = 'cc-dialog';
+  static tagName = tagName;
 
-  /**
-   * Functions to run after dialog is closed.
-   * @type {Array<Function>} - callback functions
-   */
-  #after_hide_callbacks = [];
+  @property({
+    type: String,
+    whenDefined: (value, host) => {
+      if (host.isSlotAssigned("title")) {
+        return;
+      }
+      host.slot("title").textContent = value;
+    },
+  })
+  label;
 
-  constructor() {
-    super();
+  @property({
+    type: HTMLElement,
+    selector: '[part="dialog"]',
+    readonly: true,
+    whenDefined: (dialog, host) => {
+      dialog.addEventListener("close", () => {
+        host.open = false;
+      });
+    },
+  })
+  dialog;
+
+  @property({
+    type: Boolean,
+    whenChanged: async (open, host) => {
+      await customElements.whenDefined(host.constructor.tagName);
+      if (!!open) {
+        if (host.dialog?.open) {
+          return;
+        }
+        host.dialog.showModal();
+      } else {
+        if (!host.dialog.open) {
+          return;
+        }
+        host.dialog.close();
+      }
+    },
+    whenDefined: (open, host) => {
+      if (!!open) {
+        host.dialog.showModal();
+      }
+    },
+  })
+  open = false;
+
+  connectedCallback() {
     this.render(html, css, sharedCSS);
   }
 
-  /**
-   * @returns {HTMLDialogElement}
-   */
-  get dialog() {
-    // @ts-ignore
-    return this.shadowRoot.querySelector('dialog');
-  }
-
-  /**
-   * Make another API that also opens dialog.
-   * @returns void
-   */
   show() {
-    this.setupA11yDesc();
-    this.dialog.showModal();
-    this.setupInitialFocus();
-  }
-
-  close() {
-    if (this.#after_hide_callbacks.length > 0) {
-      this.#after_hide_callbacks.forEach((fn) => {
-        fn();
-        this.#after_hide_callbacks = this.#after_hide_callbacks.filter(callback => callback !== fn);
-      });
-    }
-    this.dialog.close();
+    this.setAttribute("open", "");
+    return this;
   }
 
   hide() {
-    return this.dialog.close();
+    this.removeAttribute("open");
+    return this;
   }
 
-  /**
-   * Clean up action after dialog is closed
-   * @param {Function} callback 
-   */
-  afterHide(callback) {
-    this.#after_hide_callbacks.push(callback);
+  static observedAttributes = ["label", "open"];
+
+  attributeChangedCallback(attr) {
+    super.attributeChangedCallback(attr);
   }
-
-  /**
-   * Actions to perform after dialog is shown to users.
-   * @returns void
-   */
-  setupInitialFocus() {
-    const custom_initial_focus_element = this.querySelector('[initial-focus]');
-    if (!custom_initial_focus_element) return;
-    // @ts-ignore
-    custom_initial_focus_element?.focus();
-  }
-
-  /**
-   * Prepare a11y dialog description for screen readers.
-   * @returns void
-   */
-  setupA11yDesc() {
-    const a11y_desc_element = this.querySelector('[a11y-desc]');
-    if (!a11y_desc_element) return;
-
-    const _clone = a11y_desc_element.cloneNode(true);
-    _clone.id = 'dialog-desc';
-    _clone.setAttribute('hidden', '');
-    this.dialog.setAttribute('aria-describedby', 'dialog-desc');
-    this.shadowRoot?.appendChild(_clone);
-
-    this.afterHide(() => {
-      _clone.remove();
-      this.dialog.removeAttribute('aria-describedby');
-    });
-  }
-
-  connectedCallback() {}
-
-  static get observedAttributes() {
-		return ['label'];
-	}
-
-  attributeChangedCallback(attr, oldValue, newValue) {
-    if (attr === 'label') {
-      this.shadowRoot.querySelector('slot[name="title"]').textContent = this.getAttribute('label');
-    }
-	}
-}
-
-if (!customElements.get(CucumberDialog.__localName)) {
-	customElements.define(CucumberDialog.__localName, CucumberDialog);
 }
