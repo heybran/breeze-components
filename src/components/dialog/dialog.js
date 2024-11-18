@@ -5,6 +5,7 @@ import BaseElement from "../../shared/base-element.js";
 import "../button/button.js";
 import "../icon/icon.js";
 import "../tooltip/tooltip.js";
+import "../visually-hidden/visually-hidden.js";
 import { define, property } from "../../util/decorators.js";
 
 const tagName = "cc-dialog";
@@ -15,7 +16,7 @@ export default class CucumberDialog extends BaseElement {
 
   @property({
     type: String,
-    onChange: (value, host) => {
+    whenDefined: (value, host) => {
       if (host.isSlotAssigned("title")) {
         return;
       }
@@ -24,24 +25,59 @@ export default class CucumberDialog extends BaseElement {
   })
   label;
 
-  @property({ type: HTMLElement, selector: '[part="dialog"]' })
+  @property({
+    type: HTMLElement,
+    selector: '[part="dialog"]',
+    readonly: true,
+    whenDefined: (dialog, host) => {
+      dialog.addEventListener("close", () => {
+        host.open = false;
+      });
+    },
+  })
   dialog;
+
+  @property({
+    type: Boolean,
+    whenChanged: async (open, host) => {
+      await customElements.whenDefined(host.constructor.tagName);
+      if (!!open) {
+        if (host.dialog?.open) {
+          return;
+        }
+        host.dialog.showModal();
+      } else {
+        if (!host.dialog.open) {
+          return;
+        }
+        host.dialog.close();
+      }
+    },
+    whenDefined: (open, host) => {
+      if (!!open) {
+        host.dialog.showModal();
+      }
+    },
+  })
+  open = false;
 
   connectedCallback() {
     this.render(html, css, sharedCSS);
   }
 
   show() {
-    this.dialog.showModal();
+    this.setAttribute("open", "");
     return this;
   }
 
   hide() {
-    this.dialog.close();
+    this.removeAttribute("open");
     return this;
   }
 
-  attributeChangedCallback(attr, _oldValue, newValue) {
-    this[attr] = newValue;
+  static observedAttributes = ["label", "open"];
+
+  attributeChangedCallback(attr) {
+    super.attributeChangedCallback(attr);
   }
 }

@@ -25,3 +25,6 @@ dist-ssr
 .netlify
 cucumber-components-*.tgz
 dist
+
+.pnpm-lock.yaml
+.package-lock.json

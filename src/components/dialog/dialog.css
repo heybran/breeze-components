@@ -43,6 +43,7 @@ dialog:not([open]) {
   pointer-events: none;
   opacity: 0;
   transform: scale(0);
+  visibility: hidden;
 }
 
 dialog[open] {

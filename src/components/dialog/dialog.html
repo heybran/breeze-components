@@ -3,9 +3,9 @@
     <h2 part="title" id="title">
       <slot name="title"></slot>
     </h2>
-    <cc-button part="close-button" theme="borderless icon round" onclick="this.closest('dialog').close('close');">
+    <cc-button part="close-button" theme="borderless icon round" onclick="this.getRootNode().host.hide();">
       <cc-icon icon="cross" label="Close dialog" style="--size: 2em;"></cc-icon>
-      <cc-tooltip slot="tooltip" text="Close dialog"></cc-tooltip>
+      <cc-visually-hidden>Close</cc-visually-hidden>
     </cc-button>
   </header>
   <div part="body"><slot></slot></div>
